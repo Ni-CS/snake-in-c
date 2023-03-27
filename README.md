@@ -5,4 +5,6 @@ Snake Game in C, created for my CS class!
 
 It has a score system and spawns 2 fruits and 2 rocks every 10 moves!
 
+To test it yourself, you can download the main.c and run in your computer. Don't forget to install a properly c compiler, such as GCC.
+
 Ps: Created for windows and coded in vscode!
