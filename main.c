@@ -4,6 +4,47 @@
 #include <conio.h>
 #include <windows.h>
 
+// cores
+
+/*-----------------Cores do DOS-------------------------------------------------
+Descrição: Procedimento para definição de Cores do DOS
+------------------------------------------------------------------------------*/
+enum DOS_COLORS
+{
+    BLACK,
+    BLUE,
+    GREEN,
+    CYAN,
+    RED,
+    MAGENTA,
+    BROWN,
+    LIGHT_GRAY,
+    DARK_GRAY,
+    LIGHT_BLUE,
+    LIGHT_GREEN,
+    LIGHT_CYAN,
+    LIGHT_RED,
+    LIGHT_MAGENTA,
+    YELLOW,
+    WHITE
+};
+/*----------------------------------------------------------------------------*/
+
+/*-----------------Cores das letras---------------------------------------------
+Descrição: Procedimento para inserir cores de letras no programa
+------------------------------------------------------------------------------*/
+void textcolor(iColor)
+{
+    HANDLE hl = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO bufferInfo;
+    BOOL b = GetConsoleScreenBufferInfo(hl, &bufferInfo);
+    bufferInfo.wAttributes &= 0x00F0;
+    SetConsoleTextAttribute(hl, bufferInfo.wAttributes |= iColor);
+}
+/*----------------------------------------------------------------------------*/
+
+// fim cores
+
 typedef struct
 {
 
@@ -68,6 +109,7 @@ void printarMatriz(int matriz[25][50])
     {
         for (int c = 0; c < 50; c++)
         {
+            textcolor(LIGHT_RED);
             printf("%c", matriz[l][c]);
         }
         printf("\n");
@@ -176,7 +218,7 @@ void criarObstaculo(int cenario[25][50])
     }
 }
 
-int main()
+int jogo(int exec, int recorde[10])
 {
     srand(time(NULL));
     // definir variaveis
@@ -188,7 +230,6 @@ int main()
 
     iniciarCenario(cenario);
     iniciarKobra(&kobra);
-    // printf("aqui2");
 
     while (status == 1)
     {
@@ -208,6 +249,7 @@ int main()
         {
 
             status = 0;
+            textcolor(RED);
             printf("\n\n\nVoce morreu\n");
             system("pause");
             break;
@@ -239,13 +281,16 @@ int main()
         // cria  a cabeca da cobra
         cenario[kobra.hLinha][kobra.hColuna] = kobra.hSimbol;
         printarMatriz(cenario);
+        textcolor(LIGHT_BLUE);
         printf("\nPontos: %i", pontos);
-        printf("\n movimentos: %i", movimento);
+        textcolor(DARK_GRAY);
+        printf("\nMovimentos: %i", movimento);
 
         // verifica se bateu em parede
         if (kobra.hColuna == 0 || kobra.hColuna == 49 || kobra.hLinha == 0 || kobra.hLinha == 24)
         {
             status = 0;
+            textcolor(RED);
             printf("\n\n\nVoce bateu na parede\n");
             system("pause");
         }
@@ -260,12 +305,60 @@ int main()
         if (kobra.hLinha == comidaL[1] && kobra.hColuna == comidaC[1])
         {
             comida[1] = 0;
-            pontos += 15;
+            pontos += 10;
             tamanho += 1;
         }
 
         Sleep(50);
         system("cls");
     }
-    printf("\nGame Over :(");
+    // textcolor(RED);
+    // printf("\nGame Over :(");
+    recorde[exec] = pontos;
+    if (recorde[exec] > recorde[0])
+    {
+        recorde[0] = pontos;
+    }
+    comida[0] = 0;
+    comida[1] = 0;
+}
+int main()
+{
+    int exec = 0, recorde[10];
+    recorde[0] = 0;
+    char game = '1';
+    while (game == '1' || game == '2')
+    {
+        system("cls");
+        textcolor(BROWN);
+        printf("\n\n\n           .d8888b.                    888                    .d8888b.                                  \n          d88P  Y88b                   888                   d88P  Y88b                                 \n          Y88b.                        888                   888    888                                 \n            Y888b.   88888b.   8888b.  888  888  .d88b.      888         8888b.  88888b.d88b.   .d88b.  \n               Y88b. 888  88b      88b 888 .88P d8P  Y8b     888  88888      88b 888  888  88b d8P  Y8b \n                 888 888  888 .d888888 888888K  88888888     888    888 .d888888 888  888  888 88888888 \n          Y88b  d88P 888  888 888  888 888  88b Y8b.         Y88b  d88P 888  888 888  888  888 Y8b.     \n            Y8888P   888  888  Y888888 888  888   Y8888        Y8888P88  Y888888 888  888  888   Y8888 ");
+        printf("\n\n");
+        textcolor(LIGHT_GRAY);
+        printf("\n                                                       1-Start\n                                                       2-Rank\n                                                       3-Sair    \n");
+        game = getch();
+        switch (game)
+        {
+        case '1':
+            system("cls");
+            exec += 1;
+            jogo(exec, recorde);
+            break;
+        case '2':
+            textcolor(DARK_GRAY);
+            printf("\n                                                  Maior recorde: %i", recorde[0]);
+            for (int i = 0; i < exec; i++)
+            {
+                textcolor(DARK_GRAY);
+                printf("\n                                                      %i ... %ipts", i + 1, recorde[i + 1]);
+            }
+            printf("\n");
+            system("pause");
+            break;
+        case '3':
+            textcolor(MAGENTA);
+            printf("\n                                 Obrigado por jogar!//Thanks for playing! ~ NiCS\n");
+            exit(0);
+            break;
+        }
+    }
 }
